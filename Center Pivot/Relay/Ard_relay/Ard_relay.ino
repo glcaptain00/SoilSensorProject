@@ -24,6 +24,9 @@ void loop() {
   uint8_t packet [len] = {};
   rf95.recv(packet, &len);
   
-  packet[len-1] = packet[len-1] | 0x1;
-  rf95.send(packet, sizeof(packet));
+  if (packet[len-1] == 0b0)
+  {
+    packet[len-1] = packet[len-1] | 0b1;
+    rf95.send(packet, sizeof(packet));
+  }
 }
