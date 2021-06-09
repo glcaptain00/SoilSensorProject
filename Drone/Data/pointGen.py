@@ -3,105 +3,104 @@ import pykml
 from pykml.factory import KML_ElementMaker as KML
 from lxml import etree
 
-def checkBounds(curLocX, curLocY, minX, maxX, minY, maxY):
+def checkBounds(curLocX, curLocY, minX, maxX, minY, maxY): #Checks to see if the current location is within the bounds
     return (curLocX > maxX) or (curLocX < minX) or (curLocY > maxY) or (curLocY < minY)
 
-def genCoordFile(minX, maxX, minY, maxY, minH, maxH, step, stepH, file_name):
+def genCoordFile(minX, maxX, minY, maxY, minH, maxH, step, stepH, file_name): #Generate a basic CSV file that contains the coordinates being collected.
     file = open(file_name, "w")
     file.write("iter,height,Relative Latitude,Relative Longitude\n")
 
-    N_len = 1
-    E_len = 1
-    S_len = -2
-    W_len = -2
+    N_len = 1  #Initial number of steps North
+    E_len = 1  #Initial number of steps East
+    S_len = -2 #Initial number of steps South
+    W_len = -2 #Initial number of steps West
 
-    iter = 0
-    curLocX = 0
-    curLocY = 0
-    height = minH
-    out = False
-    file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY))
-    while (True):
-        if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out):
-            height += stepH;
-            curLocX = 0
-            curLocY = 0
-            N_len = 1
-            E_len = 1
-            S_len = -2
-            W_len = -2
-            iter = 0
-            out = False
-            if (height > maxH):
-                break
+    iter = 0 #Iteration variable. Used to keep track of total points.
+    curLocX = 0 #Initalize Current position to 0 (the origin)
+    curLocY = 0 #Initalize Current position to 0 (the origin)
+    height = minH #Initialize current height to the minimun height
+    out = False #Track if drone is out of bounds.
+    file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY)) #Write first coordinate
+    while (True): #Run forever, or until loop is broken
+        if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out): #If outside of bounds
+            height += stepH; #Increase height
+            curLocX = 0 #Reset position
+            curLocY = 0 #Reset position
+            N_len = 1   #Reset steps
+            E_len = 1   #Reset steps
+            S_len = -2  #Reset steps
+            W_len = -2  #Reset steps
+            iter = 0    #Reset iteration
+            out = False #Reset out of bounds tracker
+            if (height > maxH): #If the new height is greater than the max height
+                break #Break the while loop
             else:
-                file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY))
+                file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY)) #Write down first coordinate of new layer
         
         for i in range(curLocY+step, (N_len+1)*step, step): #N loop
-            curLocY = i
-            
-            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out == True):
-                out = True
-                break
-            iter += 1
-            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY))
+            curLocY = i #Adjust current location Y to move via the loop
+            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out): #If out of bounds
+                out = True #Set out of bounds tracker to True
+                break #Break this for loop
+            iter += 1 #increase iteration counter
+            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY)) #Write coordinate to file
         for i in range(curLocX+step, (E_len+1)*step, step): #E loop
-            curLocX = i
-            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY)):    
-                out = True
-                break
-            iter += 1
-            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY))
+            curLocX = i #Adjust current location X to move via the loop
+            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY)): #If out of bounds    
+                out = True #Set out of bounds tracker to True
+                break #Break this for loop
+            iter += 1 #increase iteration counter
+            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY)) #Write coordinate to file
         for i in range(curLocY-step, (S_len)*step, -1*step): #S_loop
-            curLocY = i
-            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out):   
-                out = True
-                break
-            iter += 1
-            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY))
+            curLocY = i #Adjust current location Y to move via the loop
+            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out): #If out of bounds   
+                out = True #Set out of bounds tracker to True
+                break #Break this for loop
+            iter += 1 #increase iteration counter
+            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY)) #Write coordinate to file
         for i in range(curLocX-step, (W_len)*step, -1*step): #S_loop
-            curLocX = i
-            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out):   
-                out = True
-                break
-            iter += 1
-            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY))
-        file.flush()
-        N_len += 1;
-        E_len += 1;
-        S_len -= 1;
-        W_len -= 1;
+            curLocX = i #Adjust current location X to move via the loop
+            if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out): #If out of bounds   
+                out = True #Set out of bounds tracker to True
+                break #Break this for loop
+            iter += 1 #increase iteration counter
+            file.write("{},{},{},{}\n".format(iter, height, curLocX, curLocY)) #Write coordinate to file
+        file.flush() #Flush file in case of program crash. This ensures that everything done so far gets recorded
+        N_len += 1; #Adjust steps
+        E_len += 1; #Adjust steps
+        S_len -= 1; #Adjust steps
+        W_len -= 1; #Adjust steps
 
 def calcTimes(minX, maxX, minY, maxY, minH, maxH, step, stepH, seconds_per_point):
-    numLayers = int((maxH - minH)/stepH)+1
-    numPointsPerLayer = (((maxX - minX) / step) + 1) * (((maxY - minY) / step) + 1)
-    totTime = numPointsPerLayer * numLayers * seconds_per_point
-    print("BOUNDS:\n\t{} <= x <= {}\n\t{} <= y <= {}\n\t{} <= h <= {}".format(minX, maxX, minY, maxY, minH, maxH))
-    print("STEP SIZE:          {}".format(step))
-    print("POINTS PER LAYER:   {}".format(numPointsPerLayer))
-    print("NUMBER OF LAYERS:   {}".format(numLayers))
-    print("TOTAL # OF POINTS:  {}".format(numPointsPerLayer * numLayers))
-    print("SECONDS PER POINT: {}".format(seconds_per_point))
-    print("="*50)
-    print("Expected runtime:\t\t\t {} hours, {} minutes, {} seconds".format(int(totTime/60/60), int(totTime/60%60), int(totTime%60)))
-    totTime *= 2
-    print("Doubled for second polarization:\t {} hours, {} minutes, {} seconds".format(int(totTime/60/60), int(totTime/60%60), int(totTime%60)))
+    numLayers = int((maxH - minH)/stepH)+1 #Calculate the number of layers
+    numPointsPerLayer = (((maxX - minX) / step) + 1) * (((maxY - minY) / step) + 1) #Calculate the number of points per layer
+    totTime = numPointsPerLayer * numLayers * seconds_per_point #Calculate total time from number of layers, number of points per layer, and number of seconds per point
+    print("BOUNDS:\n\t{} <= x <= {}\n\t{} <= y <= {}\n\t{} <= h <= {}".format(minX, maxX, minY, maxY, minH, maxH)) #Printing the info to the console.
+    print("STEP SIZE:          {}".format(step)) #Printing the info to the console.
+    print("POINTS PER LAYER:   {}".format(numPointsPerLayer)) #Printing the info to the console.
+    print("NUMBER OF LAYERS:   {}".format(numLayers)) #Printing the info to the console.
+    print("TOTAL # OF POINTS:  {}".format(numPointsPerLayer * numLayers)) #Printing the info to the console.
+    print("SECONDS PER POINT: {}".format(seconds_per_point)) #Printing the info to the console.
+    print("="*50) #Used as a seperator.
+    print("Expected runtime:\t\t\t {} hours, {} minutes, {} seconds".format(int(totTime/60/60), int(totTime/60%60), int(totTime%60))) #Display total time
+    totTime *= 2 #Multiply by two for two iterations of flight. (i.e. Parallel and Skew antenna orientations.)
+    print("Doubled for second polarization:\t {} hours, {} minutes, {} seconds".format(int(totTime/60/60), int(totTime/60%60), int(totTime%60))) #Display total time for 2 iterations (i.e. Parallel and Skew antenna orientations.)
     
 def genLitchiCoordFile(origX, origY, minX, maxX, minY, maxY, minH, maxH, step, stepH, file_name):
     file = open(file_name, "w")
     #file.write("Latitude,Longitude,Altitude (ft)\n")
 
-    N_len = 1
-    E_len = 1
-    S_len = -2
-    W_len = -2
+    N_len = 1  #Initial steps
+    E_len = 1  #Initial steps
+    S_len = -2 #Initial steps
+    W_len = -2 #Initial steps
 
-    iter = 0
-    curLocX = 0
-    curLocY = 0
-    height = minH
-    out = False
-    file.write("{},{},{}\n".format(curLocY + origY, curLocX + origX, height))
+    iter = 0 #Iteration variable.
+    curLocX = 0 #Initial position
+    curLocY = 0 #Initial position
+    height = minH #Initial Height
+    out = False #Out of bounds tracker
+    file.write("{},{},{}\n".format(curLocY + origY, curLocX + origX, height)) #Write initial coordinate.
     while (True):
         if (checkBounds(curLocX, curLocY, minX, maxX, minY, maxY) or out):
             height += stepH;
