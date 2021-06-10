@@ -214,6 +214,53 @@ def genKmlFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, step, st
     kmlLine.append(KML.coordinates(coordinateString))
     file.write(etree.tostring(kmlData, pretty_print=True, encoding='unicode'))
 
+def genLitchiPrelimFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, stepH, speed, file_name):    
+    file = open(file_name, "w")
+    items = "latitude,longitude,altitude(ft),heading(deg),curvesize(ft),rotationdir,gimbalmode,gimbalpitchangle,actiontype1,actionparam1,actiontype2,actionparam2,actiontype3,actionparam3,actiontype4,actionparam4,actiontype5,actionparam5,actiontype6,actionparam6,actiontype7,actionparam7,actiontype8,actionparam8,actiontype9,actionparam9,actiontype10,actionparam10,actiontype11,actionparam11,actiontype12,actionparam12,actiontype13,actionparam13,actiontype14,actionparam14,actiontype15,actionparam15,altitudemode,speed(m/s),poi_latitude,poi_longitude,poi_altitude(ft),poi_altitudemode,photo_timeinterval,photo_distinterval".split(",")
+    curLocX = 0
+    curLocY = 0
+    positions = [[0,0], [0,minY], [0,maxY], [0,0], [minX,0], [maxX, 0]]
+    height = minH
+    for i in range(0, (int)((maxH - minH)/stepH) + 1):
+        for pos in positions:
+            coordString = ""
+            [curLocX, curLocY] = pos
+            for j in range(len(items)):
+                data = ""
+                if (items[j].startswith("actiontype")):
+                    data = "-1"
+                elif (items[j].startswith("actionparam")):
+                    data = "0"
+                elif (items[j].startswith("curvesize")):
+                    data = "NaN"
+                elif (items[j].startswith("rotation")):
+                    data = "0"
+                elif (items[j].startswith("gimbal")):
+                    data = "0"
+                elif (items[j].startswith("latitude")):
+                    data = curLocY + origY
+                elif (items[j].startswith("longitude")):
+                    data = curLocX + origX
+                elif (items[j].startswith("altitude(")):
+                    data = height + origH
+                elif (items[j].startswith("heading")):
+                    data = "0"
+                elif (items[j].startswith("altitudemode")):
+                    data = "1"
+                elif (items[j].startswith("speed")):
+                    data = speed
+                elif (items[j].startswith("poi")):
+                    data = "0"
+                elif (items[j].startswith("photo")):
+                    data = "-1"
+                coordString += "{}{}".format("" if (coordString == "") else ",", data)
+            file.write("{}\n".format(coordString))
+            file.flush()
+        height += stepH
+    file.close()
+
+
+
 
 
 
@@ -226,5 +273,6 @@ def genKmlFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, step, st
 #calcTimes(-100, 100, -100, 100, 3, 30, 1, 3, 5)
 #genCoordFile(-100, 100, -100, 100, 3, 30, 10, 3, "test.csv")
 #genLitchiCoordFile(-97.066469, 36.125689, -0.0002, 0.0002, -0.0002, 0.0002, 1, 1, 0.00004, 1, "Litchi_coords.csv")
-genKmlFile(-97.066469, 36.125689, 273, -0.0002, 0.0002, -0.0002, 0.0002, 1, 10, 0.00004, 1, "FlightPath.kml")
+genLitchiPrelimFile(-97.066469, 36.125689, 0,  -0.0002, 0.0002, -0.0002, 0.0002, 3, 10, 1, 1.5, "Litchi_prelim.csv")
+#genKmlFile(-97.066469, 36.125689, 273, -0.0002, 0.0002, -0.0002, 0.0002, 1, 10, 0.00004, 1, "FlightPath.kml")
 
