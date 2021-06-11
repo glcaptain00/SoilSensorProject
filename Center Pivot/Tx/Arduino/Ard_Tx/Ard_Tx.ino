@@ -3,7 +3,7 @@
 #define PIN_SENSOR 1
 
 //CONSTANTS
-#define PACKET_LENGTH 21
+#define PACKET_LENGTH 18
 
 #include <RH_RF95.h>
 #include <SPI.h>
@@ -26,20 +26,21 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 	delay(500); //Delay in milliseconds.
-	long int voltage = 0x36E22ABB; //FIXME: This needs to read from the sensor, not be hard coded.
+	int voltage = 0x0ABC; //FIXME: This needs to read from the sensor, not be hard coded.
 	uint8_t data [PACKET_LENGTH] = {}; //Create an array of PACKET_LENGTH size. See 'constants' macro section (at top)
 	uint8_t of = 0x00; //Store overflow variable for right shift compression
 	uint8_t next_of = 0x00; //temp overflow. Necessary for cycling without creating a new array.
+	uint16_t temp = (voltage << 1) | 0x0000; //Left shifting one gives the overflow of right shifting 7
+	data[PACKET_LENGTH - 1] = temp & 0xFF; //Src bit is 0, so 
+	data[PACKET_LENGTH - 2] = temp >> 8;
+	for (int i = PACKET_LENGTH - 3; i >= 0; i--)
+	{
+		data[i+1] = data[i+1] | (uuid[i] << 5);
+		data[i] = uuid[i] >> 3;
+	}
 	for (int i = 0; i < PACKET_LENGTH; i++)
 	{
-		//Ternary operator: (condition) ? (value if true) : (value if false);
-		next_of = (i < 16) ? ((uuid[i] & 0x07) << 5) : (((voltage >> (((3-(i-16)) * 8)) & 0xFF) & 0x07) << 5); //Get next overflow
-		data[i] = (i < 16) ? ((uuid[i] >> 3) | of) : (((voltage >> (((3-(i-16)) * 8)) & 0xFF) >> 3) | of); //shift current byte data and apply current overflow
-		if (i == PACKET_LENGTH-1) //If at the last byte of the packet
-		{
-			data[i] = 0x00 | of; //Set last byte to 0x00 and apply of. This clears the data leak created in the ternary operator
-		}
-		of = next_of; //Set current of to next of
+		cout << hex << +data[i] << " ";
 	}
 	rf95.send(data, sizeof(data)); //Send the data.
 }
