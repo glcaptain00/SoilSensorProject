@@ -30,17 +30,13 @@ void loop() {
 	uint8_t data [PACKET_LENGTH] = {}; //Create an array of PACKET_LENGTH size. See 'constants' macro section (at top)
 	uint8_t of = 0x00; //Store overflow variable for right shift compression
 	uint8_t next_of = 0x00; //temp overflow. Necessary for cycling without creating a new array.
-	uint16_t temp = (voltage << 1) | 0x0000; //Left shifting one gives the overflow of right shifting 7
+	uint16_t temp = ((voltage & 0x3FF) << 1) | 0x0000; //Left shifting one gives the overflow of right shifting 7
 	data[PACKET_LENGTH - 1] = temp & 0xFF; //Src bit is 0, so 
 	data[PACKET_LENGTH - 2] = temp >> 8;
 	for (int i = PACKET_LENGTH - 3; i >= 0; i--)
 	{
-		data[i+1] = data[i+1] | (uuid[i] << 5);
-		data[i] = uuid[i] >> 3;
-	}
-	for (int i = 0; i < PACKET_LENGTH; i++)
-	{
-		cout << hex << +data[i] << " ";
+		data[i+1] = data[i+1] | (uuid[i] << 3);
+		data[i] = uuid[i] >> 5;
 	}
 	rf95.send(data, sizeof(data)); //Send the data.
 }
