@@ -34,8 +34,8 @@ while (True): #Loop forever
         print("Packet: {}".format(pack))
         #FIXME: verify following bitmasking
         #ASSUMING PACKET IS HEX CODE SENT FROM TRANSMITTER
-        #0x0 -> From sensor
-        #0xF -> From relay
+        #0b0 -> From sensor
+        #0b1 -> From relay
         pack = int(pack, 16)
         if (pack & 0xF != 0x0): #if packet came from sensor, then src bits = 0
             continue

@@ -103,11 +103,13 @@ while True:
                 file.write(str(now)+","+str(format(received_power))+"\n")
                 file.flush()
         """
-        packet = int(packet)
-        uuid = packet >> 17
-        volt = (packet >> 1) & 0xFFFF
-        moisture = -0.008547008547008548*volt+239.31623931623935
-        file.write("{},{},{},{}\n".format(datetime.now(),uuid,moisture))
+        #This assumes the packet remains in 1 hex string in place of the         
+        packet = int(packet, 16)
+        uuid = packet >> 11 #10 bit reading + 1 bit source 
+        volt = (packet >> 1) & 0x03FF #10 bit mask
+        moisture = -0.008547008547008548*volt+239.31623931623935 #Fahim's equation to scale packet from 0 to 100
+        rssi = 0
+        file.write("{},{},{},{}\n".format(datetime.now(),uuid,moisture, rssi))
         
         
     
