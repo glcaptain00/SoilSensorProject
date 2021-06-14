@@ -20,9 +20,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //receive packet
-  uint8_t len = 21;
-  uint8_t packet [len] = {};
-  rf95.recv(packet, &len);
+  uint8_t len = 18; //The size of packet
+  uint8_t packet [len] = {}; //Array of bytes to store packet
+  rf95.recv(packet, &packet);
   
   if (packet[len-1] == 0b0)
   {
