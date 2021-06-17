@@ -9,7 +9,7 @@
 #include <SPI.h>
 
 //UUID, don't touch. UUID: 4918bc6e-c881-11eb-b8bc-0242ac130003
-uint8_t id = 0x00;
+uint8_t id = 0x0;
 RH_RF95 rf95; //Creating global object for the radio
 void setup() {
 	Serial.begin(9600); //Initialize serial port.
@@ -28,9 +28,9 @@ void loop() {
 	int voltage = analogRead(PIN_SENSOR); //FIXME: This needs to read from the sensor, not be hard coded.
 	uint8_t* data = new uint8_t[4];
  
-	data[3] = id; //ID byte
-  data[2] = 0x00; //RSSI byte
-  data[1] = voltage & 0xFF;
-  data[0] = voltage >> 8;
+	data[3] = 0x00;
+  	data[2] = 0x00; //RSSI byte
+  	data[1] = voltage & 0xFF;
+ 	data[0] = voltage >> 8 | id << 2;
 	rf95.send(data, 4); //Send the data.
 }

@@ -57,7 +57,7 @@ PERIOD_OF_TIME = 20
 file = open("/home/pi/data_log.csv", "a")
 i=0
 if os.stat("/home/pi/data_log.csv").st_size == 0:
-        file.write("Time,UUID,Soil Moisture\n")
+        file.write("Time,UUID,Soil Moisture,RSSI (Sensor to Relay),RSSI (Relay to Base)\n")
 no_packet_start_time = time.time()
 while True:
     
@@ -74,42 +74,14 @@ while True:
     else:
         # Display the packet text and rssi
         display.fill(0)
-        """
-        #Filtering out packets with non-digits. Bad data
-        if prev_packett.isdigit():
-                prev=float(prev_packett)
-                #Convert packet's data to a scale of 0 to 100
-                prev_packet=-0.008547008547008548*prev+239.31623931623935
-                #packet_text = str(prev_packet, "utf-8")
-                display.text('Moisture: ', 0, 0, 1)
-                #display.text(packet_text, 25, 0, 1)
-                display.text(format(prev_packet), 0, 10, 1)
-                #print(prev_packett)
-                print("\nRaw Data "+str(float(prev_packett)))
-                print("Soil Moisture "+ str(prev_packet))
-                received_power=rfm9x.last_rssi
-                print("Receiver_Signal_Strength:{0} dB".format(received_power))
-                #snr=rfm9x.last_snr
-                #print("SNR:  "+str(snr))
-                #received_pow = str(received_power, "utf-8")
-                display.text('RX_Power: ', 1, 20, 2)
-                display.text(format(received_power), 55, 20, 2)
-                #time.sleep(0.1)
-         
-
-                #i=i+1
-                now = datetime.now()
-                #file.write(str(now)+","+str(i)+","+str(-i)+","+str(i-10)+","+str(i+5)+","+str(i*i)+"\n")
-                file.write(str(now)+","+str(format(received_power))+"\n")
-                file.flush()
-        """
-        #This assumes the packet remains in 1 hex string in place of the         
+        #This assumes the packet remains in 1 hex string in place of the multiple bytes       
         packet = int(packet, 16)
-        uuid = packet >> 11 #10 bit reading + 1 bit source 
-        volt = (packet >> 1) & 0x03FF #10 bit mask
+        id = packet >> 26
+        sensorRSSI = packet & 0xFFFF 
+        volt = (packet >> 16) & 0x03FF #10 bit mask
         moisture = -0.008547008547008548*volt+239.31623931623935 #Fahim's equation to scale packet from 0 to 100
-        rssi = 0
-        file.write("{},{},{},{}\n".format(datetime.now(),uuid,moisture, rssi))
+        rssi = rfm9x.last_rssi
+        file.write("{},{},{},{},{}\n".format(datetime.now(),uuid,moisture, sensorRSSI, rssi))
         
         
     
@@ -128,7 +100,7 @@ while True:
     ##  This allows us to stop when we are done flying the drone, not when the time is up
     if (btnA.value == False):
         print("BtnA pressed")
-        break
+        break #FIXME: Utilize this to create a condition to stop the code, copy the data, and start the code.
     if (btnB.value == False):
         print("BtnB pressed")
     if (btnC.value == False):

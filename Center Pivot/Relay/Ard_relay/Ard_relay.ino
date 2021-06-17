@@ -20,13 +20,15 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //receive packet
-  uint8_t len = 18; //The size of packet
-  uint8_t packet [len] = {}; //Array of bytes to store packet
+  uint8_t packet [4] = {}; //Array of bytes to store packet
   rf95.recv(packet, &packet);
-  
-  if (packet[len-1] == 0b0)
+  int16_t rssi = rf95.recv();
+
+  if ((packet[0] >> 2) == 0b0)
   {
-    packet[len-1] = packet[len-1] | 0b1;
-    rf95.send(packet, sizeof(packet));
+    packet[0] = packet[0] | 0x40;
+    
+    
+    rf95.send(packet, 4);
   }
 }
