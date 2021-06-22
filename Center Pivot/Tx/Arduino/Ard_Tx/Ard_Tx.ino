@@ -17,14 +17,18 @@ void setup() {
 	rf95.init(); //Initialize radio
 	if (!rf95.setFrequency(915.0)) //If the set frequency fails, it's out of range.
 	{
-		Serial.print("Frequency out of range.");
+		Serial.println("Frequency out of range.");
 	}
+ 
 	rf95.setTxPower(TX_POWER); //Set Tx power.
+
+  Serial.println("Startup complete");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 	delay(500); //Delay in milliseconds.
+  Serial.println("Loop");
 	int voltage = analogRead(PIN_SENSOR); //FIXME: This needs to read from the sensor, not be hard coded.
 	uint8_t* data = new uint8_t[4];
  
@@ -32,5 +36,5 @@ void loop() {
   	data[2] = 0x00; //RSSI byte
   	data[1] = voltage & 0xFF;
  	data[0] = voltage >> 8 | id << 2;
-	rf95.send(data, 4); //Send the data.
+	//rf95.send(data, 4); //Send the data.
 }
