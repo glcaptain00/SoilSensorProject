@@ -127,7 +127,7 @@ def calcTimes(minX, maxX, minY, maxY, minH, maxH, step, stepH, seconds_per_point
     totTime *= 2 #Multiply by two for two iterations of flight. (i.e. Parallel and Skew antenna orientations.)
     print("Doubled for second polarization:\t {} hours, {} minutes, {} seconds".format(int(totTime/60/60), int(totTime/60%60), int(totTime%60))) #Display total time for 2 iterations (i.e. Parallel and Skew antenna orientations.)
     
-def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, step, stepH, pause, file_name):
+def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, step, stepH, pause, pointLim, file_name):
     flightIter = 1
     file = open("{}_flight{}.csv".format(file_name, flightIter), "w")
     #file.write("Latitude,Longitude,Altitude (ft)\n")
@@ -136,7 +136,7 @@ def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, 
     E_len = 1  #Initial steps
     S_len = 2 #Initial steps
     W_len = 2 #Initial steps
-
+    
     iter = 0 #Iteration variable.
     curLocX = 0 #Initial position
     curLocY = 0 #Initial position
@@ -162,7 +162,7 @@ def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, 
                 file.write("{}\n".format(coordString)) #Write down first line of new layer
         
         for i in range(1, N_len + 1): #N loop
-            if (iter >= 90):
+            if (iter >= pointLim):
                 file.close()
                 flightIter += 1
                 file = open("{}_flight{}.csv".format(file_name, flightIter), "w")
@@ -175,7 +175,7 @@ def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, 
             coordString = genLitchiLine(curLocX, curLocY, origX, origY, height, origH, pause, file)
             file.write("{}\n".format(coordString)) #Write coordinate to file
         for i in range(1, E_len + 1): #E loop
-            if (iter >= 90):
+            if (iter >= pointLim):
                 file.close()
                 flightIter += 1
                 file = open("{}_flight{}.csv".format(file_name, flightIter), "w")
@@ -188,7 +188,7 @@ def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, 
             coordString = genLitchiLine(curLocX, curLocY, origX, origY, height, origH, pause, file)
             file.write("{}\n".format(coordString)) #Write coordinate to file
         for i in range(1, S_len + 1): #S_loop
-            if (iter >= 90):
+            if (iter >= pointLim):
                 file.close()
                 flightIter += 1
                 file = open("{}_flight{}.csv".format(file_name, flightIter), "w")
@@ -201,7 +201,7 @@ def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, 
             coordString = genLitchiLine(curLocX, curLocY, origX, origY, height, origH, pause, file)
             file.write("{}\n".format(coordString)) #Write coordinate to file
         for i in range(1, W_len + 1): #S_loop
-            if (iter >= 90):
+            if (iter >= pointLim):
                 file.close()
                 flightIter += 1
                 file = open("{}_flight{}.csv".format(file_name, flightIter), "w")
@@ -322,7 +322,15 @@ def genLitchiPrelimFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH,
 #print("*"*50)
 #calcTimes(-100, 100, -100, 100, 3, 30, 1, 3, 5)
 #genCoordFile(-100, 100, -100, 100, 3, 30, 10, 3, "test.csv")
-genLitchiCoordFile(-97.066469, 36.125689, 1, -0.0002, 0.0002, -0.0002, 0.0002, 1, 3, 0.00004, 1, 3000, "Litchi_coords")
-#genLitchiPrelimFile(-97.066469, 36.125689, 0,  -0.0002, 0.0002, -0.0002, 0.0002, 3, 10, 1, 1.5, 3000, "Litchi_prelim")
+#genLitchiPrelimFile(-96.835393, 36.162516, 0,  -0.0002, 0.0002, -0.0002, 0.0002, 3, 10, 1, 1.5, 5000, "Litchi_prelim")
 #genKmlFile(-97.066469, 36.125689, 273, -0.0002, 0.0002, -0.0002, 0.0002, 1, 10, 0.00004, 1, "FlightPath.kml")
 
+#Fewer Points
+#genLitchiCoordFile(-97.083522, 36.131149, 0, -0.0002, 0.0002, -0.0002, 0.0002, 1, 5, 0.00005, 1, 5000, 45, "Litchi_coords")
+#Less Dense
+genLitchiCoordFile(-97.083522, 36.131149, 0, -0.0002, 0.0002, -0.0002, 0.0002, 1, 5, 0.0001, 1, 5000, 90, "Litchi_coords")
+
+
+
+#AIR FIELD
+#genLitchiCoordFile(-96.835393, 36.162516, 0, -0.0002, 0.0002, -0.0002, 0.0002, 1, 5, 0.00005, 1, 5000, "Litchi_coords")
