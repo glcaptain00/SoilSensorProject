@@ -29,9 +29,15 @@ if (os.stat(args[4] if len(args) == 5 else "output.csv").st_size == 0): #If the 
 
 for line in dataFile: #Iterate through every line in data file.
     data = line.split(",") #Split by comma (CSV file)
-    relLat = float(data[2]) - lat #calculate relative latitude
-    relLong = float(data[3]) - long #calculate relative longitude
-    outputFile.write("{},{},{},{},{}".format(data[0], data[1], relLat, relLong, data[4])) #Write to output file.
+    relLat = ""
+    relLong = ""
+    try:
+        relLat = float(data[2]) - lat #calculate relative latitude
+        relLong = float(data[3]) - long #calculate relative longitude
+        outputFile.write("{},{},{},{},{}".format(data[0], data[1], relLat, relLong, data[4])) #Write to output file.
+    
+    except:
+        relLat = relLat #Just need a line here
     
 outputFile.close() #Close output file to write the bitstream
     
