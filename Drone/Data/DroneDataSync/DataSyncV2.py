@@ -44,12 +44,12 @@ droneDataJSON = {} #Create a JavaScript Object Notation (JSON) object for storin
 ##end format
 
 ##FIRST LOOP
-filesInDir = os.listdir()
-for file in filesInDir:
-    if not (file.startswith("1-")):
-        continue
-    drone = open(file, "r")
-    drone.readline()
+filesInDir = os.listdir() #Store a list of all files in the current working directory
+for file in filesInDir: #For all files in the working directory
+    if not (file.startswith("1-")): #If the file does not begin with the proper stage number
+        continue #Skip it
+    drone = open(file, "r") #Open the file
+    drone.readline() #Read the column headers
     for data in drone: #For every line in the drone data file
         dDat = data.split(",") #split each line by ',' (Comma Seperated Value file)
         print("{} - {}".format(file, data))

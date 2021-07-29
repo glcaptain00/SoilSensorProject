@@ -20,12 +20,12 @@ except:
     print("Invalid parameter")
     sys.exit(0) #Exit if the try block catches an error.
 
-filesInDir = os.listdir()
-for file in filesInDir:
-    if not (file.startswith("2-")):
-        continue
-    dataFile = open(file, "r")
-    outputFile = open(file.replace("2-","3-"),"w")
+filesInDir = os.listdir() #List files in directory
+for file in filesInDir: #For all files in directory
+    if not (file.startswith("2-")): #If file does not start with proper stage number
+        continue #Skip it
+    dataFile = open(file, "r") #Open input file
+    outputFile = open(file.replace("2-","3-"),"w") #Open output file
     dataFile.readline() #Ignore column names
 
 

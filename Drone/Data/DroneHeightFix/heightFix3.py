@@ -1,4 +1,4 @@
-#This file calculates the height of the drone based on the speed at which it was moving. This is zSpeed
+#This file calculates the height of the drone based on the speed at which it was moving and the throttle. Averages height of all points from last movement to create a flat layer
 file = open("airData.csv", "r")
 out = open("airDataFixed3.csv", "w")
 

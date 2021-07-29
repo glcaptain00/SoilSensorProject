@@ -1,4 +1,4 @@
-#This file calculates the height of the drone based on the speed at which it was moving. This is zSpeed
+#This file calculates the height of the drone based on the speed at which it was moving and throttle applied. This is zSpeed
 file = open("airData.csv", "r")
 out = open("airDataFixed2.csv", "w")
 
