@@ -230,19 +230,21 @@ def genLitchiCoordFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, 
 
 def genLitchiPrelimFile(origX, origY, origH, minX, maxX, minY, maxY, minH, maxH, stepH, speed, pause, file_name):    
     file = open("{}.csv".format(file_name), "w")
+    
+    #This line is split by commas
     items = "latitude,longitude,altitude(ft),heading(deg),curvesize(ft),rotationdir,gimbalmode,gimbalpitchangle,actiontype1,actionparam1,actiontype2,actionparam2,actiontype3,actionparam3,actiontype4,actionparam4,actiontype5,actionparam5,actiontype6,actionparam6,actiontype7,actionparam7,actiontype8,actionparam8,actiontype9,actionparam9,actiontype10,actionparam10,actiontype11,actionparam11,actiontype12,actionparam12,actiontype13,actionparam13,actiontype14,actionparam14,actiontype15,actionparam15,altitudemode,speed(m/s),poi_latitude,poi_longitude,poi_altitude(ft),poi_altitudemode,photo_timeinterval,photo_distinterval".split(",")
-    curLocX = 0
-    curLocY = 0
-    positions = [[0,0], [0,minY], [0,maxY], [0,0], [minX,0], [maxX, 0]]
-    height = minH
-    for i in range(0, (int)((maxH - minH)/stepH) + 1):
-        for pos in positions:
-            [curLocX, curLocY] = pos
-            coordString = genLitchiLine(curLocX, curLocY, origX, origY, height, origH, pause, file)
-            file.write("{}\n".format(coordString))
-            file.flush()
-        height += stepH
-    file.close()
+    curLocX = 0 #Current X position
+    curLocY = 0 #Current Y position
+    positions = [[0,0], [0,minY], [0,maxY], [0,0], [minX,0], [maxX, 0]] #The position in each layer of the prelim flight
+    height = minH #Set the height of the layer to the minimum height
+    for i in range(0, (int)((maxH - minH)/stepH) + 1): #Loop through each of the heights
+        for pos in positions: #Loop through each of the positions
+            [curLocX, curLocY] = pos #Set the current location variables to the position
+            coordString = genLitchiLine(curLocX, curLocY, origX, origY, height, origH, pause, file) #Generate the line
+            file.write("{}\n".format(coordString)) #Write the line
+            file.flush() #Flush the stream
+        height += stepH #Increase the height
+    file.close() #Close the file
 
 
 
